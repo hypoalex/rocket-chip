@@ -62,3 +62,13 @@ class QUICK_ACCESSFields extends Bundle {
 
 }
 
+class CONFIG_STRING_ADDRESSFields extends Bundle {
+
+  /* This is 2 to indicate Config String Address command.
+  */
+  val cmdtype = UInt(8.W)
+
+  val reserved0 = UInt(24.W)
+
+}
+
