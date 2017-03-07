@@ -410,8 +410,6 @@ trait DebugModule extends Module with HasDebugModuleParameters with HasRegMap {
   val errorUnsupported = Wire(init = false.B)
   val errorHaltResume  = Wire(init = false.B)
 
-  val abstractCSClearError = ABSTRACTCSWrEn && (ABSTRACTCSWrData.cmderr === 0.U)
-
   when(~dmactive){
     ABSTRACTCSReg := ABSTRACTCSReset
   }.otherwise {
@@ -425,8 +423,9 @@ trait DebugModule extends Module with HasDebugModuleParameters with HasRegMap {
     }.elsewhen (errorHaltResume) {
       ABSTRACTCSReg.cmderr := DebugAbstractCommandError.ErrHaltResume.id.U
     }.otherwise {
-      when (abstractCSClearError){
-        ABSTRACTCSReg.cmderr := DebugAbstractCommandError.None.id.U
+      when (ABSTRACTCSWrEn){
+        // Write 1 to clear for each bit
+        ABSTRACTCSReg.cmderr = ABSTRACTCSReg.cmderr & ~ABSTRACTCSWrData.cmderr
       }
     }
 
@@ -544,7 +543,6 @@ trait DebugModule extends Module with HasDebugModuleParameters with HasRegMap {
     }
   }
 
- 
   //--------------------------------------------------------------
   // Abstract Data Access (Debug Bus ... System Bus can override)
   //--------------------------------------------------------------
