@@ -69,7 +69,12 @@ class AXI4FuzzMaster()(implicit p: Parameters) extends LazyModule
   val model = LazyModule(new TLRAMModel("AXI4FuzzMaster"))
 
   model.node := fuzz.node
-  node := TLToAXI4(4)(TLDelayer(0.1)(model.node))
+  node :=
+    TLToAXI4(4)(
+    TLDelayer(0.1)(
+    TLBuffer(TLBufferConfig.flow)(
+    TLDelayer(0.1)(
+    model.node))))
 
   lazy val module = new LazyModuleImp(this) {
     val io = new Bundle {
@@ -84,9 +89,16 @@ class AXI4FuzzMaster()(implicit p: Parameters) extends LazyModule
 class AXI4FuzzSlave()(implicit p: Parameters) extends LazyModule
 {
   val node = AXI4InputNode()
-  val ram  = LazyModule(new TLRAM(AddressSet(0x0, 0xfff)))
+  val ram  = LazyModule(new TLTestRAM(AddressSet(0x0, 0xfff)))
 
-  ram.node := TLFragmenter(4, 16)(AXI4ToTL()(AXI4Fragmenter()(node)))
+  ram.node :=
+    TLFragmenter(4, 16)(
+    TLDelayer(0.1)(
+    TLBuffer(TLBufferConfig.flow)(
+    TLDelayer(0.1)(
+    AXI4ToTL()(
+    AXI4Fragmenter()(
+    node))))))
 
   lazy val module = new LazyModuleImp(this) {
     val io = new Bundle {
