@@ -35,13 +35,6 @@ class TLBuffer(a: Int = 2, b: Int = 2, c: Int = 2, d: Int = 2, e: Int = 2, pipe:
         if (b>0) { in .b <> Queue(out.b, b, pipe && b<2) } else { in.b <> out.b }
         if (c>0) { out.c <> Queue(in .c, c, pipe && c<2) } else { out.c <> in.c }
         if (e>0) { out.e <> Queue(in .e, e, pipe && e<2) } else { out.e <> in.e }
-      } else {
-        in.b.valid := Bool(false)
-        in.c.ready := Bool(true)
-        in.e.ready := Bool(true)
-        out.b.ready := Bool(true)
-        out.c.valid := Bool(false)
-        out.e.valid := Bool(false)
       }
     }
   }
